@@ -50,6 +50,33 @@
 
   "use strict";
 
+  function AccountsRouterConfig($stateProvider) {
+    $stateProvider
+      .state("sign_up", {
+        url: "/sign_up",
+        templateUrl: "/static/accounts/views/sign_up/sign_up.html",
+        controller: "SignUpController"
+      })
+      .state("log_in", {
+        url: "/log_in",
+        templateUrl: "/static/accounts/views/log_in/log_in.html",
+        controller: "LogInController"
+      })
+      .state("log_out", {
+        url: "/log_out",
+        templateUrl: "/static/accounts/views/log_out/log_out.html",
+        controller: "LogOutController"
+      });
+  }
+
+  angular.module("app")
+    .config(["$stateProvider", AccountsRouterConfig]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
   function BooksRouterConfig($stateProvider) {
     $stateProvider.state("library.books", {
       url: "/books",
@@ -121,6 +148,122 @@
   angular.module("app")
     .controller("SettingsController", ["$scope", SettingsController])
     .config(["$stateProvider", SettingsRouterConfig]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function AccountsModel() {
+    var account = {};
+
+    var service = {
+      update: update
+    };
+
+    function update(data) {
+
+    }
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("AccountsModel", [AccountsModel]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function accountsService(AccountsModel) {
+    var service = {};
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("accountsService", ["AccountsModel", accountsService]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function logInService(AccountsModel) {
+    var service = {
+      logIn: logIn
+    };
+
+    function logIn(email, password) {
+      return $http.post("/log_in/", {
+        email: email,
+        password: password
+      }).then(function (response) {
+        AccountsModel.update(response.data);
+      }, function () {
+        console.error("Log in failed!");
+      });
+    }
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("logInService", ["AccountsModel", logInService]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function logOutService(AccountsModel) {
+    var service = {
+      logOut: logOut
+    };
+
+    function logOut() {
+      return $http.get("/log_out/").then(function (response) {
+        AccountsModel.update(response.data);
+      }, function () {
+        console.error("Log out failed!");
+      });
+    }
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("logOutService", ["AccountsModel", logOutService]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function signUpService(AccountsModel) {
+    var service = {
+      signUp: signUp
+    };
+
+    function signUp(firstName, lastName, email, password) {
+      return $http.post("/sign_up/", {
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        password: password
+      }).then(function (response) {
+        AccountsModel.update(response.data);
+      }, function () {
+        console.error("Sign up failed!");
+      });
+    }
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("signUpService", ["AccountsModel", signUpService]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -436,6 +579,57 @@
 
   angular.module("app")
     .factory("membersService", ["MembersModel", membersService]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function LogInController($scope) {
+    $scope.email = "";
+    $scope.form = "";
+    $scope.password = "";
+
+    $scope.onSubmit = function onSubmit() {
+
+    };
+  }
+
+  angular.module("app")
+    .controller("LogInController", ["$scope", LogInController]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function LogOutController($scope) {
+
+  }
+
+  angular.module("app")
+    .controller("LogOutController", ["$scope", LogOutController]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function SignUpController($scope) {
+    $scope.email = "";
+    $scope.firstName = "";
+    $scope.form = "";
+    $scope.lastName = "";
+    $scope.password1 = "";
+    $scope.password2 = "";
+
+    $scope.onSubmit = function onSubmit() {
+
+    };
+  }
+
+  angular.module("app")
+    .controller("SignUpController", ["$scope", SignUpController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
