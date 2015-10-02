@@ -14,6 +14,7 @@
         template: "<div ui-view></div>",
         resolve: {
           books: function(booksService, loadBooksService) {
+            console.log("Has books: %s", booksService.hasBooks());
             if (!booksService.hasBooks()) {
               loadBooksService.getBooks();
             }
@@ -135,20 +136,37 @@
   "use strict";
 
   function BooksModel() {
+    var authors = [];
     var books = [];
+    var categories = [];
 
     var service = {
+      getAuthors: getAuthors,
       getBooks: getBooks,
+      getCategories: getCategories,
       update: update
     };
+
+    function getAuthors() {
+      return authors;
+    }
 
     function getBooks() {
       return books;
     }
 
+    function getCategories() {
+      return categories;
+    }
+
     function update(data) {
+      authors = data.authors;
+      categories = data.categories;
+
+      // Update books with author and category objects...
       _.forEach(data.books, function (book) {
         book._authors = [];
+        book._categories = [];
 
         _.forEach(book.authors, function (authorId) {
           book._authors.push(_.find(data.authors, "id", authorId));
@@ -169,6 +187,48 @@
 
   angular.module("app")
     .factory("BooksModel", [BooksModel]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function authorsService(BooksModel) {
+    var selectedAuthor = {};
+
+    var service = {
+      getAuthors: getAuthors,
+      getSelectedAuthor: getSelectedAuthor,
+      hasAuthors: hasAuthors,
+      isSelectedAuthor: isSelectedAuthor,
+      setSelectedAuthor: setSelectedAuthor
+    };
+
+    function getAuthors() {
+      return BooksModel.getAuthors();
+    }
+
+    function getSelectedAuthor() {
+      return selectedAuthor;
+    }
+
+    function hasAuthors() {
+      return !_.isEmpty(BooksModel.getAuthors());
+    }
+
+    function isSelectedAuthor(author) {
+      return (selectedAuthor === author);
+    }
+
+    function setSelectedAuthor(author) {
+      selectedAuthor = author;
+    }
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("authorsService", ["BooksModel", authorsService]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -204,6 +264,48 @@
 
     function setSelectedBook(book) {
       selectedBook = book;
+    }
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("booksService", ["BooksModel", booksService]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function booksService(BooksModel) {
+    var selectedCategory = {};
+
+    var service = {
+      getCategories: getCategories,
+      getSelectedCategory: getSelectedCategory,
+      hasCategories: hasCategories,
+      isSelectedCategory: isSelectedCategory,
+      setSelectedCategory: setSelectedCategory
+    };
+
+    function getCategories() {
+      return BooksModel.getCategories();
+    }
+
+    function getSelectedCategory() {
+      return selectedCategory;
+    }
+
+    function hasCategories() {
+      return !_.isEmpty(BooksModel.getCategories());
+    }
+
+    function isSelectedCategory(book) {
+      return (selectedCategory === book);
+    }
+
+    function setSelectedCategory(book) {
+      selectedCategory = book;
     }
 
     return service;

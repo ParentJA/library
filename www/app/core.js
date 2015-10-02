@@ -14,6 +14,7 @@
         template: "<div ui-view></div>",
         resolve: {
           books: function(booksService, loadBooksService) {
+            console.log("Has books: %s", booksService.hasBooks());
             if (!booksService.hasBooks()) {
               loadBooksService.getBooks();
             }
