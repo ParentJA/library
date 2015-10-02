@@ -1,0 +1,15 @@
+<div class="component--book">
+  <div class="book-image"></div>
+  <div>
+    <span class="book-title">{{ book.title }}</span>
+    <span class="book-publication-date">{{ book.publication_date | date: 'longDate' }}</span>
+  </div>
+  <div>
+    By {{ authors | join }}
+  </div>
+  <div>
+    <ul>
+      <li ng-repeat="category in book._categories | orderBy: 'name'">{{ category.name }}</li>
+    </ul>
+  </div>
+</div>

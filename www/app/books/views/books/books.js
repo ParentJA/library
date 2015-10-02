@@ -2,6 +2,13 @@
 
   "use strict";
 
-  angular.module("app");
+  function BooksController($scope, booksService) {
+    $scope.getBooks = function getBooks() {
+      return booksService.getBooks();
+    };
+  }
+
+  angular.module("app")
+    .controller("BooksController", ["$scope", "booksService", BooksController]);
 
 })(window, window.angular);

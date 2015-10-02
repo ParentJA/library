@@ -1,0 +1,273 @@
+- fields: {app_label: admin, model: logentry}
+  model: contenttypes.contenttype
+  pk: 1
+- fields: {app_label: auth, model: permission}
+  model: contenttypes.contenttype
+  pk: 2
+- fields: {app_label: auth, model: group}
+  model: contenttypes.contenttype
+  pk: 3
+- fields: {app_label: auth, model: user}
+  model: contenttypes.contenttype
+  pk: 4
+- fields: {app_label: contenttypes, model: contenttype}
+  model: contenttypes.contenttype
+  pk: 5
+- fields: {app_label: sessions, model: session}
+  model: contenttypes.contenttype
+  pk: 6
+- fields: {app_label: books, model: author}
+  model: contenttypes.contenttype
+  pk: 7
+- fields: {app_label: books, model: book}
+  model: contenttypes.contenttype
+  pk: 8
+- fields: {app_label: books, model: bookauthor}
+  model: contenttypes.contenttype
+  pk: 9
+- fields: {app_label: books, model: bookcategory}
+  model: contenttypes.contenttype
+  pk: 10
+- fields: {app_label: books, model: category}
+  model: contenttypes.contenttype
+  pk: 11
+- fields: {app_label: books, model: library}
+  model: contenttypes.contenttype
+  pk: 12
+- fields: {app_label: books, model: libraryaddress}
+  model: contenttypes.contenttype
+  pk: 13
+- fields: {app_label: books, model: librarybook}
+  model: contenttypes.contenttype
+  pk: 14
+- fields: {app_label: core, model: address}
+  model: contenttypes.contenttype
+  pk: 15
+- fields: {app_label: members, model: member}
+  model: contenttypes.contenttype
+  pk: 16
+- fields: {app_label: members, model: memberaddress}
+  model: contenttypes.contenttype
+  pk: 17
+- fields: {app_label: members, model: memberrequest}
+  model: contenttypes.contenttype
+  pk: 18
+- fields: {expire_date: ! '2015-10-16 14:29:16.102431+00:00', session_data: OTgzZTcxZmI0N2ExNDQwM2Y2NmY1MjNhYmQyY2ZhZjQ0NTAxNWNmMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjVjYzc2YTcxOTY3M2E0OWM2MjRlMDczNzVjODY3ZTM5NzNiMWZmNjYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=}
+  model: sessions.session
+  pk: r3bh14ev0p8kfoack0b51nftgmjzb7st
+- fields: {first_name: Bill, last_name: Roorbach}
+  model: books.author
+  pk: 1
+- fields: {publication_date: 2002-11-27, title: Big Bend}
+  model: books.book
+  pk: 1
+- fields: {author: 1, book: 1}
+  model: books.bookauthor
+  pk: 1
+- fields: {book: 1, category: 1}
+  model: books.bookcategory
+  pk: 1
+- fields: {name: Fiction}
+  model: books.category
+  pk: 1
+- fields: {codename: add_logentry, content_type: 1, name: Can add log entry}
+  model: auth.permission
+  pk: 1
+- fields: {codename: change_logentry, content_type: 1, name: Can change log entry}
+  model: auth.permission
+  pk: 2
+- fields: {codename: delete_logentry, content_type: 1, name: Can delete log entry}
+  model: auth.permission
+  pk: 3
+- fields: {codename: add_permission, content_type: 2, name: Can add permission}
+  model: auth.permission
+  pk: 4
+- fields: {codename: change_permission, content_type: 2, name: Can change permission}
+  model: auth.permission
+  pk: 5
+- fields: {codename: delete_permission, content_type: 2, name: Can delete permission}
+  model: auth.permission
+  pk: 6
+- fields: {codename: add_group, content_type: 3, name: Can add group}
+  model: auth.permission
+  pk: 7
+- fields: {codename: change_group, content_type: 3, name: Can change group}
+  model: auth.permission
+  pk: 8
+- fields: {codename: delete_group, content_type: 3, name: Can delete group}
+  model: auth.permission
+  pk: 9
+- fields: {codename: add_user, content_type: 4, name: Can add user}
+  model: auth.permission
+  pk: 10
+- fields: {codename: change_user, content_type: 4, name: Can change user}
+  model: auth.permission
+  pk: 11
+- fields: {codename: delete_user, content_type: 4, name: Can delete user}
+  model: auth.permission
+  pk: 12
+- fields: {codename: add_contenttype, content_type: 5, name: Can add content type}
+  model: auth.permission
+  pk: 13
+- fields: {codename: change_contenttype, content_type: 5, name: Can change content
+      type}
+  model: auth.permission
+  pk: 14
+- fields: {codename: delete_contenttype, content_type: 5, name: Can delete content
+      type}
+  model: auth.permission
+  pk: 15
+- fields: {codename: add_session, content_type: 6, name: Can add session}
+  model: auth.permission
+  pk: 16
+- fields: {codename: change_session, content_type: 6, name: Can change session}
+  model: auth.permission
+  pk: 17
+- fields: {codename: delete_session, content_type: 6, name: Can delete session}
+  model: auth.permission
+  pk: 18
+- fields: {codename: add_author, content_type: 7, name: Can add author}
+  model: auth.permission
+  pk: 19
+- fields: {codename: change_author, content_type: 7, name: Can change author}
+  model: auth.permission
+  pk: 20
+- fields: {codename: delete_author, content_type: 7, name: Can delete author}
+  model: auth.permission
+  pk: 21
+- fields: {codename: add_book, content_type: 8, name: Can add book}
+  model: auth.permission
+  pk: 22
+- fields: {codename: change_book, content_type: 8, name: Can change book}
+  model: auth.permission
+  pk: 23
+- fields: {codename: delete_book, content_type: 8, name: Can delete book}
+  model: auth.permission
+  pk: 24
+- fields: {codename: add_bookauthor, content_type: 9, name: Can add book author}
+  model: auth.permission
+  pk: 25
+- fields: {codename: change_bookauthor, content_type: 9, name: Can change book author}
+  model: auth.permission
+  pk: 26
+- fields: {codename: delete_bookauthor, content_type: 9, name: Can delete book author}
+  model: auth.permission
+  pk: 27
+- fields: {codename: add_bookcategory, content_type: 10, name: Can add book category}
+  model: auth.permission
+  pk: 28
+- fields: {codename: change_bookcategory, content_type: 10, name: Can change book
+      category}
+  model: auth.permission
+  pk: 29
+- fields: {codename: delete_bookcategory, content_type: 10, name: Can delete book
+      category}
+  model: auth.permission
+  pk: 30
+- fields: {codename: add_category, content_type: 11, name: Can add category}
+  model: auth.permission
+  pk: 31
+- fields: {codename: change_category, content_type: 11, name: Can change category}
+  model: auth.permission
+  pk: 32
+- fields: {codename: delete_category, content_type: 11, name: Can delete category}
+  model: auth.permission
+  pk: 33
+- fields: {codename: add_library, content_type: 12, name: Can add library}
+  model: auth.permission
+  pk: 34
+- fields: {codename: change_library, content_type: 12, name: Can change library}
+  model: auth.permission
+  pk: 35
+- fields: {codename: delete_library, content_type: 12, name: Can delete library}
+  model: auth.permission
+  pk: 36
+- fields: {codename: add_libraryaddress, content_type: 13, name: Can add library address}
+  model: auth.permission
+  pk: 37
+- fields: {codename: change_libraryaddress, content_type: 13, name: Can change library
+      address}
+  model: auth.permission
+  pk: 38
+- fields: {codename: delete_libraryaddress, content_type: 13, name: Can delete library
+      address}
+  model: auth.permission
+  pk: 39
+- fields: {codename: add_librarybook, content_type: 14, name: Can add library book}
+  model: auth.permission
+  pk: 40
+- fields: {codename: change_librarybook, content_type: 14, name: Can change library
+      book}
+  model: auth.permission
+  pk: 41
+- fields: {codename: delete_librarybook, content_type: 14, name: Can delete library
+      book}
+  model: auth.permission
+  pk: 42
+- fields: {codename: add_address, content_type: 15, name: Can add address}
+  model: auth.permission
+  pk: 43
+- fields: {codename: change_address, content_type: 15, name: Can change address}
+  model: auth.permission
+  pk: 44
+- fields: {codename: delete_address, content_type: 15, name: Can delete address}
+  model: auth.permission
+  pk: 45
+- fields: {codename: add_member, content_type: 16, name: Can add member}
+  model: auth.permission
+  pk: 46
+- fields: {codename: change_member, content_type: 16, name: Can change member}
+  model: auth.permission
+  pk: 47
+- fields: {codename: delete_member, content_type: 16, name: Can delete member}
+  model: auth.permission
+  pk: 48
+- fields: {codename: add_memberaddress, content_type: 17, name: Can add member address}
+  model: auth.permission
+  pk: 49
+- fields: {codename: change_memberaddress, content_type: 17, name: Can change member
+      address}
+  model: auth.permission
+  pk: 50
+- fields: {codename: delete_memberaddress, content_type: 17, name: Can delete member
+      address}
+  model: auth.permission
+  pk: 51
+- fields: {codename: add_memberrequest, content_type: 18, name: Can add member request}
+  model: auth.permission
+  pk: 52
+- fields: {codename: change_memberrequest, content_type: 18, name: Can change member
+      request}
+  model: auth.permission
+  pk: 53
+- fields: {codename: delete_memberrequest, content_type: 18, name: Can delete member
+      request}
+  model: auth.permission
+  pk: 54
+- fields:
+    date_joined: 2015-10-02 14:28:54.709403+00:00
+    email: jason.a.parent@gmail.com
+    first_name: ''
+    groups: []
+    is_active: true
+    is_staff: true
+    is_superuser: true
+    last_login: 2015-10-02 14:29:16.088215+00:00
+    last_name: ''
+    password: pbkdf2_sha256$20000$U6NXtkstrOD0$HskCByveM5/QgPtZzeNoGOOjU1FGE+SW/utaQ5H8zBs=
+    user_permissions: []
+    username: jason.a.parent@gmail.com
+  model: auth.user
+  pk: 1
+- fields: {action_flag: 1, action_time: ! '2015-10-02 17:12:23.967182+00:00', change_message: '',
+    content_type: 7, object_id: '1', object_repr: 'Roorbach, Bill', user: 1}
+  model: admin.logentry
+  pk: 1
+- fields: {action_flag: 1, action_time: ! '2015-10-02 17:14:23.552219+00:00', change_message: '',
+    content_type: 11, object_id: '1', object_repr: Fiction, user: 1}
+  model: admin.logentry
+  pk: 2
+- fields: {action_flag: 1, action_time: ! '2015-10-02 17:14:27.208336+00:00', change_message: '',
+    content_type: 8, object_id: '1', object_repr: Big Bend, user: 1}
+  model: admin.logentry
+  pk: 3

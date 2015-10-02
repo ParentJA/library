@@ -1,5 +1,8 @@
 __author__ = 'jason.a.parent@gmail.com (Jason Parent)'
 
+# Standard library imports...
+from itertools import chain
+
 # Third-party imports...
 from rest_framework import status, views
 from rest_framework.response import Response
@@ -20,10 +23,18 @@ class AuthorAPIView(views.APIView):
 
 class BookAPIView(views.APIView):
     def get(self, request):
-        books = Book.objects.prefetch_related('authors', 'categories')
+        books = Book.objects.prefetch_related()
+
+        # Extract authors...
+        authors = set(chain.from_iterable([[author for author in book.authors.all()] for book in books]))
+
+        # Extract categories...
+        categories = set(chain.from_iterable([[category for category in book.categories.all()] for book in books]))
 
         return Response(status=status.HTTP_200_OK, data={
-            'books': BookSerializer(books, many=True).data
+            'authors': AuthorSerializer(authors, many=True).data,
+            'books': BookSerializer(books, many=True).data,
+            'categories': CategorySerializer(categories, many=True).data
         })
 
 
@@ -38,7 +49,7 @@ class CategoryAPIView(views.APIView):
 
 class LibraryAPIView(views.APIView):
     def get(self, request):
-        libraries = Library.objects.prefetch_related('books')
+        libraries = Library.objects.all()
 
         return Response(status=status.HTTP_200_OK, data={
             'libraries': LibrarySerializer(libraries, many=True).data
