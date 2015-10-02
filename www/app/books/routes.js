@@ -2,10 +2,6 @@
 
   "use strict";
 
-  function BooksController($scope) {
-
-  }
-
   function BooksRouterConfig($stateProvider) {
     $stateProvider.state("library.books", {
       url: "/books",
@@ -15,7 +11,6 @@
   }
 
   angular.module("app")
-    .controller("BooksController", ["$scope", BooksController])
     .config(["$stateProvider", BooksRouterConfig]);
 
 })(window, window.angular);

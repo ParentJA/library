@@ -10,22 +10,22 @@ from .models import Author, Book, Category, Library
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = ('id',)
+        fields = ('id', 'first_name', 'last_name')
 
 
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ('id',)
+        fields = ('id', 'title', 'publication_date', 'authors', 'categories')
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('id',)
+        fields = ('id', 'name')
 
 
 class LibrarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Library
-        fields = ('id',)
+        fields = ('id', 'name', 'addresses', 'books')

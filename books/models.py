@@ -5,7 +5,11 @@ from django.db import models
 
 
 class Author(models.Model):
-    pass
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return '{}, {}'.format(self.last_name, self.first_name)
 
 
 class Book(models.Model):
@@ -21,6 +25,11 @@ class Book(models.Model):
         through_fields=('book', 'category'),
         related_name='books'
     )
+    title = models.CharField(max_length=255)
+    publication_date = models.DateField()
+
+    def __unicode__(self):
+        return self.title
 
 
 class BookAuthor(models.Model):
@@ -37,8 +46,13 @@ class BookCategory(models.Model):
 
 
 class Category(models.Model):
+    name = models.CharField(max_length=255)
+
     class Meta:
         verbose_name_plural = 'categories'
+
+    def __unicode__(self):
+        return self.name
 
 
 class Library(models.Model):
@@ -54,9 +68,13 @@ class Library(models.Model):
         through_fields=('library', 'book'),
         related_name='libraries'
     )
+    name = models.CharField(max_length=255)
 
     class Meta:
         verbose_name_plural = 'libraries'
+
+    def __unicode__(self):
+        return self.name
 
 
 class LibraryAddress(models.Model):
