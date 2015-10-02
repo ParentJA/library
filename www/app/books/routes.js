@@ -2,8 +2,10 @@
 
   "use strict";
 
-  function BooksController($scope) {
-
+  function BooksController($scope, booksService) {
+    $scope.getBooks = function getBooks() {
+      return booksService.getBooks();
+    };
   }
 
   function BooksRouterConfig($stateProvider) {
@@ -15,7 +17,7 @@
   }
 
   angular.module("app")
-    .controller("BooksController", ["$scope", BooksController])
+    .controller("BooksController", ["$scope", "booksService", BooksController])
     .config(["$stateProvider", BooksRouterConfig]);
 
 })(window, window.angular);

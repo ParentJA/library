@@ -50,8 +50,10 @@
 
   "use strict";
 
-  function BooksController($scope) {
-
+  function BooksController($scope, booksService) {
+    $scope.getBooks = function getBooks() {
+      return booksService.getBooks();
+    };
   }
 
   function BooksRouterConfig($stateProvider) {
@@ -63,7 +65,7 @@
   }
 
   angular.module("app")
-    .controller("BooksController", ["$scope", BooksController])
+    .controller("BooksController", ["$scope", "booksService", BooksController])
     .config(["$stateProvider", BooksRouterConfig]);
 
 })(window, window.angular);
@@ -145,7 +147,21 @@
     }
 
     function update(data) {
+      _.forEach(data.books, function (book) {
+        book._authors = [];
 
+        _.forEach(book.authors, function (authorId) {
+          book._authors.push(_.find(data.authors, "id", authorId));
+        });
+
+        book._categories = [];
+
+        _.forEach(book.categories, function (categoryId) {
+          book._categories.push(_.find(data.categories, "id", categoryId));
+        });
+      });
+
+      books = data.books;
     }
 
     return service;
