@@ -14,7 +14,6 @@
         template: "<div ui-view></div>",
         resolve: {
           books: function(booksService, loadBooksService) {
-            console.log("Has books: %s", booksService.hasBooks());
             if (!booksService.hasBooks()) {
               loadBooksService.getBooks();
             }
@@ -51,12 +50,6 @@
 
   "use strict";
 
-  function BooksController($scope, booksService) {
-    $scope.getBooks = function getBooks() {
-      return booksService.getBooks();
-    };
-  }
-
   function BooksRouterConfig($stateProvider) {
     $stateProvider.state("library.books", {
       url: "/books",
@@ -66,7 +59,6 @@
   }
 
   angular.module("app")
-    .controller("BooksController", ["$scope", "booksService", BooksController])
     .config(["$stateProvider", BooksRouterConfig]);
 
 })(window, window.angular);
@@ -172,8 +164,6 @@
           book._authors.push(_.find(data.authors, "id", authorId));
         });
 
-        book._categories = [];
-
         _.forEach(book.categories, function (categoryId) {
           book._categories.push(_.find(data.categories, "id", categoryId));
         });
@@ -277,7 +267,7 @@
 
   "use strict";
 
-  function booksService(BooksModel) {
+  function categoriesService(BooksModel) {
     var selectedCategory = {};
 
     var service = {
@@ -312,7 +302,7 @@
   }
 
   angular.module("app")
-    .factory("booksService", ["BooksModel", booksService]);
+    .factory("categoriesService", ["BooksModel", categoriesService]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -337,6 +327,22 @@
 
   angular.module("app")
     .factory("loadBooksService", ["$http", "BASE_URL", "BooksModel", loadBooksService]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function join() {
+    return function joinFilter(strings, separator) {
+      separator = separator || ", ";
+
+      return strings.join(separator);
+    };
+  }
+
+  angular.module("app")
+    .filter("join", [join]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -436,7 +442,14 @@
 
   "use strict";
 
-  angular.module("app");
+  function BooksController($scope, booksService) {
+    $scope.getBooks = function getBooks() {
+      return booksService.getBooks();
+    };
+  }
+
+  angular.module("app")
+    .controller("BooksController", ["$scope", "booksService", BooksController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -458,5 +471,33 @@
   "use strict";
 
   angular.module("app");
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function BookController($scope) {
+    $scope.authors = _.map($scope.book._authors, function (author) {
+      return _.template("${author.first_name} ${author.last_name}")({
+        author: author
+      });
+    });
+  }
+
+  function book() {
+    return {
+      restrict: "A",
+      scope: {
+        book: "="
+      },
+      templateUrl: "/static/books/views/books/components/book/book.html",
+      controller: "BookController"
+    };
+  }
+
+  angular.module("app")
+    .controller("BookController", ["$scope", BookController])
+    .directive("book", [book]);
 
 })(window, window.angular);
