@@ -19,13 +19,6 @@
             }
 
             return booksService.getBooks();
-          },
-          members: function(loadMembersService, membersService) {
-            if (!membersService.hasMembers()) {
-              loadMembersService.getMembers();
-            }
-
-            return membersService.getMembers();
           }
         },
         abstract: true
@@ -39,10 +32,25 @@
     $rootScope.$state = $state;
   }
 
-  angular.module("app", ["ui.router"])
+  function MainController($scope, accountsService) {
+    $scope.getUser = function getUser() {
+      return accountsService.getUser();
+    };
+
+    $scope.hasUser = function hasUser() {
+      return accountsService.hasUser();
+    };
+
+    $scope.logOut = function logOut() {
+      accountsService.logOut();
+    };
+  }
+
+  angular.module("app", ["ngCookies", "ui.router"])
     .constant("BASE_URL", "/api/v1/")
     .config(["$httpProvider", HttpConfig])
     .config(["$stateProvider", "$urlRouterProvider", UiRouterConfig])
-    .run(["$rootScope", "$state", UiRunner]);
+    .run(["$rootScope", "$state", UiRunner])
+    .controller("MainController", ["$scope", "accountsService", MainController]);
 
 })(window, window.angular);

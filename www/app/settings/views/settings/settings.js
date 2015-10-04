@@ -2,6 +2,9 @@
 
   "use strict";
 
-  angular.module("app");
+  function SettingsController($scope) {}
+
+  angular.module("app")
+    .controller("SettingsController", ["$scope", SettingsController]);
 
 })(window, window.angular);

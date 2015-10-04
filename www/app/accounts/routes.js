@@ -13,11 +13,6 @@
         url: "/log_in",
         templateUrl: "/static/accounts/views/log_in/log_in.html",
         controller: "LogInController"
-      })
-      .state("log_out", {
-        url: "/log_out",
-        templateUrl: "/static/accounts/views/log_out/log_out.html",
-        controller: "LogOutController"
       });
   }
 

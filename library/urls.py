@@ -11,6 +11,7 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='index.html')),
+    url(r'^accounts/', include('accounts.urls')),
     url(r'^api/v1/library/book/', include('books.urls')),
     url(r'^api/v1/library/core/', include('core.urls')),
     url(r'^api/v1/library/member/', include('members.urls')),

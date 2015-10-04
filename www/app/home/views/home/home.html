@@ -1,5 +1,10 @@
-<div class="row">
-  <div class="col-lg-12">
-    <h1>Home</h1>
+<div class="middle-center">
+  <h1>Welcome to the Library</h1>
+  <div ng-show="hasUser()">
+    <a class="btn btn-large btn-primary" ui-sref="library.books">Continue to Books</a>
+  </div>
+  <div ng-hide="hasUser()">
+    <a class="btn btn-large btn-primary" ui-sref="log_in">Log in</a>
+    <a class="btn btn-large btn-primary" ui-sref="sign_up">Sign up</a>
   </div>
 </div>

@@ -2,21 +2,38 @@
 
   "use strict";
 
-  function AccountsModel() {
-    var account = {};
-
+  function AccountsModel($cookies) {
     var service = {
-      update: update
+      clearUser: clearUser,
+      getUser: getUser,
+      hasUser: hasUser,
+      setUser: setUser
     };
 
-    function update(data) {
+    function clearUser() {
+      $cookies.remove("authenticatedUser");
+    }
 
+    function getUser() {
+      if (!$cookies.get("authenticatedUser")) {
+        return undefined;
+      }
+
+      return JSON.parse($cookies.get("authenticatedUser"));
+    }
+
+    function hasUser() {
+      return !!$cookies.get("authenticatedUser");
+    }
+
+    function setUser(user) {
+      $cookies.put("authenticatedUser", JSON.stringify(user));
     }
 
     return service;
   }
 
   angular.module("app")
-    .factory("AccountsModel", [AccountsModel]);
+    .factory("AccountsModel", ["$cookies", AccountsModel]);
 
 })(window, window.angular);

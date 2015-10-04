@@ -2,11 +2,9 @@
 
   "use strict";
 
-  function LogOutController($scope) {
-
-  }
+  function ProfileController($scope) {}
 
   angular.module("app")
-    .controller("LogOutController", ["$scope", LogOutController]);
+    .controller("ProfileController", ["$scope", ProfileController]);
 
 })(window, window.angular);

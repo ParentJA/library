@@ -19,13 +19,6 @@
             }
 
             return booksService.getBooks();
-          },
-          members: function(loadMembersService, membersService) {
-            if (!membersService.hasMembers()) {
-              loadMembersService.getMembers();
-            }
-
-            return membersService.getMembers();
           }
         },
         abstract: true
@@ -39,11 +32,26 @@
     $rootScope.$state = $state;
   }
 
-  angular.module("app", ["ui.router"])
+  function MainController($scope, accountsService) {
+    $scope.getUser = function getUser() {
+      return accountsService.getUser();
+    };
+
+    $scope.hasUser = function hasUser() {
+      return accountsService.hasUser();
+    };
+
+    $scope.logOut = function logOut() {
+      accountsService.logOut();
+    };
+  }
+
+  angular.module("app", ["ngCookies", "ui.router"])
     .constant("BASE_URL", "/api/v1/")
     .config(["$httpProvider", HttpConfig])
     .config(["$stateProvider", "$urlRouterProvider", UiRouterConfig])
-    .run(["$rootScope", "$state", UiRunner]);
+    .run(["$rootScope", "$state", UiRunner])
+    .controller("MainController", ["$scope", "accountsService", MainController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -61,11 +69,6 @@
         url: "/log_in",
         templateUrl: "/static/accounts/views/log_in/log_in.html",
         controller: "LogInController"
-      })
-      .state("log_out", {
-        url: "/log_out",
-        templateUrl: "/static/accounts/views/log_out/log_out.html",
-        controller: "LogOutController"
       });
   }
 
@@ -93,8 +96,6 @@
 
   "use strict";
 
-  function HomeController($scope) {}
-
   function HomeRouterConfig($stateProvider) {
     $stateProvider.state("home", {
       url: "/",
@@ -104,7 +105,6 @@
   }
 
   angular.module("app")
-    .controller("HomeController", ["$scope", HomeController])
     .config(["$stateProvider", HomeRouterConfig]);
 
 })(window, window.angular);
@@ -112,30 +112,21 @@
 
   "use strict";
 
-  function MembersController($scope) {
-
-  }
-
-  function MembersRouterConfig($stateProvider) {
-    $stateProvider.state("library.members", {
-      url: "/members",
-      templateUrl: "/static/members/views/members/members.html",
-      controller: "MembersController"
+  function ProfileRouterConfig($stateProvider) {
+    $stateProvider.state("profile", {
+      url: "/profile",
+      templateUrl: "/static/profile/views/profile/profile.html",
+      controller: "ProfileController"
     });
   }
 
   angular.module("app")
-    .controller("MembersController", ["$scope", MembersController])
-    .config(["$stateProvider", MembersRouterConfig]);
+    .config(["$stateProvider", ProfileRouterConfig]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
 
   "use strict";
-
-  function SettingsController($scope) {
-
-  }
 
   function SettingsRouterConfig($stateProvider) {
     $stateProvider.state("settings", {
@@ -146,7 +137,6 @@
   }
 
   angular.module("app")
-    .controller("SettingsController", ["$scope", SettingsController])
     .config(["$stateProvider", SettingsRouterConfig]);
 
 })(window, window.angular);
@@ -154,108 +144,88 @@
 
   "use strict";
 
-  function AccountsModel() {
-    var account = {};
-
+  function AccountsModel($cookies) {
     var service = {
-      update: update
+      clearUser: clearUser,
+      getUser: getUser,
+      hasUser: hasUser,
+      setUser: setUser
     };
 
-    function update(data) {
+    function clearUser() {
+      $cookies.remove("authenticatedUser");
+    }
 
+    function getUser() {
+      if (!$cookies.get("authenticatedUser")) {
+        return undefined;
+      }
+
+      return JSON.parse($cookies.get("authenticatedUser"));
+    }
+
+    function hasUser() {
+      return !!$cookies.get("authenticatedUser");
+    }
+
+    function setUser(user) {
+      $cookies.put("authenticatedUser", JSON.stringify(user));
     }
 
     return service;
   }
 
   angular.module("app")
-    .factory("AccountsModel", [AccountsModel]);
+    .factory("AccountsModel", ["$cookies", AccountsModel]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
 
   "use strict";
 
-  function accountsService(AccountsModel) {
-    var service = {};
-
-    return service;
-  }
-
-  angular.module("app")
-    .factory("accountsService", ["AccountsModel", accountsService]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function logInService(AccountsModel) {
+  function accountsService($http, AccountsModel) {
     var service = {
-      logIn: logIn
+      getUser: getUser,
+      hasUser: hasUser,
+      logIn: logIn,
+      logOut: logOut,
+      signUp: signUp
     };
 
-    function logIn(email, password) {
-      return $http.post("/log_in/", {
-        email: email,
+    function getUser() {
+      return AccountsModel.getUser();
+    }
+
+    function hasUser() {
+      return AccountsModel.hasUser();
+    }
+
+    function logIn(username, password) {
+      return $http.post("/accounts/log_in/", {
+        username: username,
         password: password
       }).then(function (response) {
-        AccountsModel.update(response.data);
-      }, function () {
-        console.error("Log in failed!");
+        AccountsModel.setUser(response.data);
       });
     }
 
-    return service;
-  }
-
-  angular.module("app")
-    .factory("logInService", ["AccountsModel", logInService]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function logOutService(AccountsModel) {
-    var service = {
-      logOut: logOut
-    };
-
     function logOut() {
-      return $http.get("/log_out/").then(function (response) {
-        AccountsModel.update(response.data);
+      return $http.post("/accounts/log_out/", {}).then(function (response) {
+        AccountsModel.clearUser();
       }, function () {
         console.error("Log out failed!");
       });
     }
 
-    return service;
-  }
-
-  angular.module("app")
-    .factory("logOutService", ["AccountsModel", logOutService]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function signUpService(AccountsModel) {
-    var service = {
-      signUp: signUp
-    };
-
     function signUp(firstName, lastName, email, password) {
-      return $http.post("/sign_up/", {
+      return $http.post("/accounts/sign_up/", {
         first_name: firstName,
         last_name: lastName,
+        username: email,
         email: email,
         password: password
-      }).then(function (response) {
-        AccountsModel.update(response.data);
-      }, function () {
-        console.error("Sign up failed!");
+      }).then(function () {
+        return logIn(email, password);
       });
     }
 
@@ -263,63 +233,7 @@
   }
 
   angular.module("app")
-    .factory("signUpService", ["AccountsModel", signUpService]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function BooksModel() {
-    var authors = [];
-    var books = [];
-    var categories = [];
-
-    var service = {
-      getAuthors: getAuthors,
-      getBooks: getBooks,
-      getCategories: getCategories,
-      update: update
-    };
-
-    function getAuthors() {
-      return authors;
-    }
-
-    function getBooks() {
-      return books;
-    }
-
-    function getCategories() {
-      return categories;
-    }
-
-    function update(data) {
-      authors = data.authors;
-      categories = data.categories;
-
-      // Update books with author and category objects...
-      _.forEach(data.books, function (book) {
-        book._authors = [];
-        book._categories = [];
-
-        _.forEach(book.authors, function (authorId) {
-          book._authors.push(_.find(data.authors, "id", authorId));
-        });
-
-        _.forEach(book.categories, function (categoryId) {
-          book._categories.push(_.find(data.categories, "id", categoryId));
-        });
-      });
-
-      books = data.books;
-    }
-
-    return service;
-  }
-
-  angular.module("app")
-    .factory("BooksModel", [BooksModel]);
+    .factory("accountsService", ["$http", "AccountsModel", accountsService]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -476,6 +390,62 @@
 
   "use strict";
 
+  function BooksModel() {
+    var authors = [];
+    var books = [];
+    var categories = [];
+
+    var service = {
+      getAuthors: getAuthors,
+      getBooks: getBooks,
+      getCategories: getCategories,
+      update: update
+    };
+
+    function getAuthors() {
+      return authors;
+    }
+
+    function getBooks() {
+      return books;
+    }
+
+    function getCategories() {
+      return categories;
+    }
+
+    function update(data) {
+      authors = data.authors;
+      categories = data.categories;
+
+      // Update books with author and category objects...
+      _.forEach(data.books, function (book) {
+        book._authors = [];
+        book._categories = [];
+
+        _.forEach(book.authors, function (authorId) {
+          book._authors.push(_.find(data.authors, "id", authorId));
+        });
+
+        _.forEach(book.categories, function (categoryId) {
+          book._categories.push(_.find(data.categories, "id", categoryId));
+        });
+      });
+
+      books = data.books;
+    }
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("BooksModel", [BooksModel]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
   function join() {
     return function joinFilter(strings, separator) {
       separator = separator || ", ";
@@ -492,144 +462,61 @@
 
   "use strict";
 
-  function MembersModel() {
-    var members = [];
-
-    var service = {
-      getMembers: getMembers,
-      update: update
-    };
-
-    function getMembers() {
-      return members;
-    }
-
-    function update(data) {
-
-    }
-
-    return service;
-  }
-
-  angular.module("app")
-    .factory("MembersModel", [MembersModel]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function loadMembersService($http, BASE_URL, MembersModel) {
-    var service = {
-      getMembers: getMembers
-    };
-
-    function getMembers() {
-      return $http.get(BASE_URL + "library/member/").then(function (response) {
-        MembersModel.update(response.data);
-      }, function () {
-        console.error("Members failed to load!");
-      });
-    }
-
-    return service;
-  }
-
-  angular.module("app")
-    .factory("loadMembersService", ["$http", "BASE_URL", "MembersModel", loadMembersService]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function membersService(MembersModel) {
-    var selectedMember = {};
-
-    var service = {
-      getMembers: getMembers,
-      getSelectedMember: getSelectedMember,
-      hasMembers: hasMembers,
-      isSelectedMember: isSelectedMember,
-      setSelectedMember: setSelectedMember
-    };
-
-    function getMembers() {
-      return MembersModel.getMembers();
-    }
-
-    function getSelectedMember() {
-      return selectedMember;
-    }
-
-    function hasMembers() {
-      return !_.isEmpty(MembersModel.getMembers());
-    }
-
-    function isSelectedMember(member) {
-      return (selectedMember === member);
-    }
-
-    function setSelectedMember(member) {
-      selectedMember = member;
-    }
-
-    return service;
-  }
-
-  angular.module("app")
-    .factory("membersService", ["MembersModel", membersService]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function LogInController($scope) {
+  function SignUpController($scope, $state, accountsService) {
     $scope.email = "";
-    $scope.form = "";
-    $scope.password = "";
-
-    $scope.onSubmit = function onSubmit() {
-
-    };
-  }
-
-  angular.module("app")
-    .controller("LogInController", ["$scope", LogInController]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function LogOutController($scope) {
-
-  }
-
-  angular.module("app")
-    .controller("LogOutController", ["$scope", LogOutController]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function SignUpController($scope) {
-    $scope.email = "";
+    $scope.error = {};
     $scope.firstName = "";
     $scope.form = "";
     $scope.lastName = "";
     $scope.password1 = "";
     $scope.password2 = "";
 
-    $scope.onSubmit = function onSubmit() {
+    $scope.hasError = function hasError() {
+      return !_.isEmpty($scope.error);
+    };
 
+    $scope.onSubmit = function onSubmit() {
+      accountsService.signUp($scope.firstName, $scope.lastName, $scope.email, $scope.password1).then(function () {
+        $state.go("home");
+      }, function (response) {
+        $scope.error = response.data;
+        $scope.email = "";
+        $scope.password1 = "";
+        $scope.password2 = "";
+      });
     };
   }
 
   angular.module("app")
-    .controller("SignUpController", ["$scope", SignUpController]);
+    .controller("SignUpController", ["$scope", "$state", "accountsService", SignUpController]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function LogInController($scope, $state, accountsService) {
+    $scope.error = {};
+    $scope.form = "";
+    $scope.password = "";
+    $scope.username = "";
+
+    $scope.hasError = function hasError() {
+      return !_.isEmpty($scope.error);
+    };
+
+    $scope.onSubmit = function onSubmit() {
+      accountsService.logIn($scope.username, $scope.password).then(function () {
+        $state.go("home");
+      }, function (response) {
+        $scope.error = response.data;
+        $scope.password = "";
+      });
+    };
+  }
+
+  angular.module("app")
+    .controller("LogInController", ["$scope", "$state", "accountsService", LogInController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -650,21 +537,34 @@
 
   "use strict";
 
-  angular.module("app");
+  function HomeController($scope, accountsService) {
+    $scope.hasUser = function hasUser() {
+      return accountsService.hasUser();
+    };
+  }
+
+  angular.module("app")
+    .controller("HomeController", ["$scope", "accountsService", HomeController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
 
   "use strict";
 
-  angular.module("app");
+  function ProfileController($scope) {}
+
+  angular.module("app")
+    .controller("ProfileController", ["$scope", ProfileController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
 
   "use strict";
 
-  angular.module("app");
+  function SettingsController($scope) {}
+
+  angular.module("app")
+    .controller("SettingsController", ["$scope", SettingsController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
