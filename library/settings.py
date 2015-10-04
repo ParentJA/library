@@ -32,7 +32,6 @@ LOCAL_APPS = (
     'accounts',
     'books',
     'core',
-    'members',
 )
 
 INSTALLED_APPS = ('grappelli',) + DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS

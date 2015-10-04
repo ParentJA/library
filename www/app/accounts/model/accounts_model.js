@@ -26,8 +26,8 @@
       return !!$cookies.get("authenticatedUser");
     }
 
-    function setUser(user) {
-      $cookies.put("authenticatedUser", JSON.stringify(user));
+    function setUser(data) {
+      $cookies.put("authenticatedUser", JSON.stringify(data.user));
     }
 
     return service;

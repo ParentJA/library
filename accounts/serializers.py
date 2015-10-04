@@ -24,5 +24,5 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id', 'username', 'first_name', 'last_name', 'email', 'photo', 'date_of_birth', 'phone_number',
-            'password', 'password_confirmation'
+            'password', 'password_confirmation', 'addresses', 'requests'
         )

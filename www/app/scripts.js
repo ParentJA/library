@@ -32,7 +32,7 @@
     $rootScope.$state = $state;
   }
 
-  function MainController($scope, accountsService) {
+  function MainController($scope, $state, accountsService) {
     $scope.getUser = function getUser() {
       return accountsService.getUser();
     };
@@ -42,7 +42,9 @@
     };
 
     $scope.logOut = function logOut() {
-      accountsService.logOut();
+      accountsService.logOut().then(function () {
+        $state.go("home");
+      });
     };
   }
 
@@ -51,7 +53,7 @@
     .config(["$httpProvider", HttpConfig])
     .config(["$stateProvider", "$urlRouterProvider", UiRouterConfig])
     .run(["$rootScope", "$state", UiRunner])
-    .controller("MainController", ["$scope", "accountsService", MainController]);
+    .controller("MainController", ["$scope", "$state", "accountsService", MainController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -168,8 +170,8 @@
       return !!$cookies.get("authenticatedUser");
     }
 
-    function setUser(user) {
-      $cookies.put("authenticatedUser", JSON.stringify(user));
+    function setUser(data) {
+      $cookies.put("authenticatedUser", JSON.stringify(data.user));
     }
 
     return service;
@@ -234,6 +236,62 @@
 
   angular.module("app")
     .factory("accountsService", ["$http", "AccountsModel", accountsService]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function BooksModel() {
+    var authors = [];
+    var books = [];
+    var categories = [];
+
+    var service = {
+      getAuthors: getAuthors,
+      getBooks: getBooks,
+      getCategories: getCategories,
+      update: update
+    };
+
+    function getAuthors() {
+      return authors;
+    }
+
+    function getBooks() {
+      return books;
+    }
+
+    function getCategories() {
+      return categories;
+    }
+
+    function update(data) {
+      authors = data.authors;
+      categories = data.categories;
+
+      // Update books with author and category objects...
+      _.forEach(data.books, function (book) {
+        book._authors = [];
+        book._categories = [];
+
+        _.forEach(book.authors, function (authorId) {
+          book._authors.push(_.find(data.authors, "id", authorId));
+        });
+
+        _.forEach(book.categories, function (categoryId) {
+          book._categories.push(_.find(data.categories, "id", categoryId));
+        });
+      });
+
+      books = data.books;
+    }
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("BooksModel", [BooksModel]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -390,62 +448,6 @@
 
   "use strict";
 
-  function BooksModel() {
-    var authors = [];
-    var books = [];
-    var categories = [];
-
-    var service = {
-      getAuthors: getAuthors,
-      getBooks: getBooks,
-      getCategories: getCategories,
-      update: update
-    };
-
-    function getAuthors() {
-      return authors;
-    }
-
-    function getBooks() {
-      return books;
-    }
-
-    function getCategories() {
-      return categories;
-    }
-
-    function update(data) {
-      authors = data.authors;
-      categories = data.categories;
-
-      // Update books with author and category objects...
-      _.forEach(data.books, function (book) {
-        book._authors = [];
-        book._categories = [];
-
-        _.forEach(book.authors, function (authorId) {
-          book._authors.push(_.find(data.authors, "id", authorId));
-        });
-
-        _.forEach(book.categories, function (categoryId) {
-          book._categories.push(_.find(data.categories, "id", categoryId));
-        });
-      });
-
-      books = data.books;
-    }
-
-    return service;
-  }
-
-  angular.module("app")
-    .factory("BooksModel", [BooksModel]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
   function join() {
     return function joinFilter(strings, separator) {
       separator = separator || ", ";
@@ -456,6 +458,34 @@
 
   angular.module("app")
     .filter("join", [join]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function LogInController($scope, $state, accountsService) {
+    $scope.error = {};
+    $scope.form = "";
+    $scope.password = "";
+    $scope.username = "";
+
+    $scope.hasError = function hasError() {
+      return !_.isEmpty($scope.error);
+    };
+
+    $scope.onSubmit = function onSubmit() {
+      accountsService.logIn($scope.username, $scope.password).then(function () {
+        $state.go("home");
+      }, function (response) {
+        $scope.error = response.data;
+        $scope.password = "";
+      });
+    };
+  }
+
+  angular.module("app")
+    .controller("LogInController", ["$scope", "$state", "accountsService", LogInController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -489,34 +519,6 @@
 
   angular.module("app")
     .controller("SignUpController", ["$scope", "$state", "accountsService", SignUpController]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function LogInController($scope, $state, accountsService) {
-    $scope.error = {};
-    $scope.form = "";
-    $scope.password = "";
-    $scope.username = "";
-
-    $scope.hasError = function hasError() {
-      return !_.isEmpty($scope.error);
-    };
-
-    $scope.onSubmit = function onSubmit() {
-      accountsService.logIn($scope.username, $scope.password).then(function () {
-        $state.go("home");
-      }, function (response) {
-        $scope.error = response.data;
-        $scope.password = "";
-      });
-    };
-  }
-
-  angular.module("app")
-    .controller("LogInController", ["$scope", "$state", "accountsService", LogInController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {

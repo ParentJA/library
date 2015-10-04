@@ -44,7 +44,9 @@ class LogInView(views.APIView):
             if user.is_active:
                 login(request, user)
 
-                return Response(UserSerializer(user).data)
+                return Response(status=status.HTTP_200_OK, data={
+                    'user': UserSerializer(user).data
+                })
 
             else:
                 return Response({

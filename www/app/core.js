@@ -32,7 +32,7 @@
     $rootScope.$state = $state;
   }
 
-  function MainController($scope, accountsService) {
+  function MainController($scope, $state, accountsService) {
     $scope.getUser = function getUser() {
       return accountsService.getUser();
     };
@@ -42,7 +42,9 @@
     };
 
     $scope.logOut = function logOut() {
-      accountsService.logOut();
+      accountsService.logOut().then(function () {
+        $state.go("home");
+      });
     };
   }
 
@@ -51,6 +53,6 @@
     .config(["$httpProvider", HttpConfig])
     .config(["$stateProvider", "$urlRouterProvider", UiRouterConfig])
     .run(["$rootScope", "$state", UiRunner])
-    .controller("MainController", ["$scope", "accountsService", MainController]);
+    .controller("MainController", ["$scope", "$state", "accountsService", MainController]);
 
 })(window, window.angular);
