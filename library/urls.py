@@ -11,9 +11,9 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='index.html')),
+    url(r'^accounts/', include('accounts.urls')),
     url(r'^api/v1/library/book/', include('books.urls')),
     url(r'^api/v1/library/core/', include('core.urls')),
-    url(r'^api/v1/library/member/', include('members.urls')),
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/', include(admin.site.urls)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
