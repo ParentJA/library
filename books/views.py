@@ -23,13 +23,17 @@ class AuthorAPIView(views.APIView):
 
 class BookAPIView(views.APIView):
     def get(self, request):
-        books = Book.objects.prefetch_related()
+        books = Book.objects.prefetch_related('authors', 'categories', 'user_requests')
 
         # Extract authors...
         authors = set(chain.from_iterable([[author for author in book.authors.all()] for book in books]))
 
         # Extract categories...
         categories = set(chain.from_iterable([[category for category in book.categories.all()] for book in books]))
+
+        # Check availability...
+        for book in books:
+            book.is_available = not book.user_requests.exists()
 
         return Response(status=status.HTTP_200_OK, data={
             'authors': AuthorSerializer(authors, many=True).data,

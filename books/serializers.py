@@ -14,9 +14,11 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
+    is_available = serializers.BooleanField()
+
     class Meta:
         model = Book
-        fields = ('id', 'title', 'publication_date', 'authors', 'categories')
+        fields = ('id', 'title', 'publication_date', 'authors', 'categories', 'is_available')
 
 
 class CategorySerializer(serializers.ModelSerializer):

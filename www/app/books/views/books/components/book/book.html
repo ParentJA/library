@@ -12,4 +12,5 @@
       <li ng-repeat="category in book._categories | orderBy: 'name'">{{ category.name }}</li>
     </ul>
   </div>
+  <div>Available: {{ book.is_available }}</div>
 </div>
