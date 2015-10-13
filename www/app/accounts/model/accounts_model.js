@@ -11,23 +11,23 @@
     };
 
     function clearUser() {
-      $cookies.remove("authenticatedUser");
+      $cookies.remove("libAuthenticatedUser");
     }
 
     function getUser() {
-      if (!$cookies.get("authenticatedUser")) {
+      if (!$cookies.get("libAuthenticatedUser")) {
         return undefined;
       }
 
-      return JSON.parse($cookies.get("authenticatedUser"));
+      return JSON.parse($cookies.get("libAuthenticatedUser"));
     }
 
     function hasUser() {
-      return !!$cookies.get("authenticatedUser");
+      return !!$cookies.get("libAuthenticatedUser");
     }
 
     function setUser(data) {
-      $cookies.put("authenticatedUser", JSON.stringify(data.user));
+      $cookies.put("libAuthenticatedUser", JSON.stringify(data.user));
     }
 
     return service;
