@@ -2,9 +2,9 @@
 
   "use strict";
 
-  function SettingsController($scope) {}
+  function ProfileController($scope) {}
 
   angular.module("app")
-    .controller("SettingsController", ["$scope", SettingsController]);
+    .controller("ProfileController", ["$scope", ProfileController]);
 
 })(window, window.angular);

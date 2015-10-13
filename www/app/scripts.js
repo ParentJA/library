@@ -19,13 +19,6 @@
             }
 
             return booksService.getBooks();
-          },
-          members: function(loadMembersService, membersService) {
-            if (!membersService.hasMembers()) {
-              loadMembersService.getMembers();
-            }
-
-            return membersService.getMembers();
           }
         },
         abstract: true
@@ -39,11 +32,50 @@
     $rootScope.$state = $state;
   }
 
-  angular.module("app", ["ui.router"])
+  function MainController($scope, $state, accountsService) {
+    $scope.getUser = function getUser() {
+      return accountsService.getUser();
+    };
+
+    $scope.hasUser = function hasUser() {
+      return accountsService.hasUser();
+    };
+
+    $scope.logOut = function logOut() {
+      accountsService.logOut().then(function () {
+        $state.go("home");
+      });
+    };
+  }
+
+  angular.module("app", ["ngCookies", "ui.router"])
     .constant("BASE_URL", "/api/v1/")
     .config(["$httpProvider", HttpConfig])
     .config(["$stateProvider", "$urlRouterProvider", UiRouterConfig])
-    .run(["$rootScope", "$state", UiRunner]);
+    .run(["$rootScope", "$state", UiRunner])
+    .controller("MainController", ["$scope", "$state", "accountsService", MainController]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function AccountsRouterConfig($stateProvider) {
+    $stateProvider
+      .state("sign_up", {
+        url: "/sign_up",
+        templateUrl: "/static/accounts/views/sign_up/sign_up.html",
+        controller: "SignUpController"
+      })
+      .state("log_in", {
+        url: "/log_in",
+        templateUrl: "/static/accounts/views/log_in/log_in.html",
+        controller: "LogInController"
+      });
+  }
+
+  angular.module("app")
+    .config(["$stateProvider", AccountsRouterConfig]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -66,8 +98,6 @@
 
   "use strict";
 
-  function HomeController($scope) {}
-
   function HomeRouterConfig($stateProvider) {
     $stateProvider.state("home", {
       url: "/",
@@ -77,7 +107,6 @@
   }
 
   angular.module("app")
-    .controller("HomeController", ["$scope", HomeController])
     .config(["$stateProvider", HomeRouterConfig]);
 
 })(window, window.angular);
@@ -85,30 +114,21 @@
 
   "use strict";
 
-  function MembersController($scope) {
-
-  }
-
-  function MembersRouterConfig($stateProvider) {
-    $stateProvider.state("library.members", {
-      url: "/members",
-      templateUrl: "/static/members/views/members/members.html",
-      controller: "MembersController"
+  function ProfileRouterConfig($stateProvider) {
+    $stateProvider.state("profile", {
+      url: "/profile",
+      templateUrl: "/static/profile/views/profile/profile.html",
+      controller: "ProfileController"
     });
   }
 
   angular.module("app")
-    .controller("MembersController", ["$scope", MembersController])
-    .config(["$stateProvider", MembersRouterConfig]);
+    .config(["$stateProvider", ProfileRouterConfig]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
 
   "use strict";
-
-  function SettingsController($scope) {
-
-  }
 
   function SettingsRouterConfig($stateProvider) {
     $stateProvider.state("settings", {
@@ -119,8 +139,103 @@
   }
 
   angular.module("app")
-    .controller("SettingsController", ["$scope", SettingsController])
     .config(["$stateProvider", SettingsRouterConfig]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function AccountsModel($cookies) {
+    var service = {
+      clearUser: clearUser,
+      getUser: getUser,
+      hasUser: hasUser,
+      setUser: setUser
+    };
+
+    function clearUser() {
+      $cookies.remove("authenticatedUser");
+    }
+
+    function getUser() {
+      if (!$cookies.get("authenticatedUser")) {
+        return undefined;
+      }
+
+      return JSON.parse($cookies.get("authenticatedUser"));
+    }
+
+    function hasUser() {
+      return !!$cookies.get("authenticatedUser");
+    }
+
+    function setUser(data) {
+      $cookies.put("authenticatedUser", JSON.stringify(data.user));
+    }
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("AccountsModel", ["$cookies", AccountsModel]);
+
+})(window, window.angular);
+(function (window, angular, undefined) {
+
+  "use strict";
+
+  function accountsService($http, AccountsModel) {
+    var service = {
+      getUser: getUser,
+      hasUser: hasUser,
+      logIn: logIn,
+      logOut: logOut,
+      signUp: signUp
+    };
+
+    function getUser() {
+      return AccountsModel.getUser();
+    }
+
+    function hasUser() {
+      return AccountsModel.hasUser();
+    }
+
+    function logIn(username, password) {
+      return $http.post("/accounts/log_in/", {
+        username: username,
+        password: password
+      }).then(function (response) {
+        AccountsModel.setUser(response.data);
+      });
+    }
+
+    function logOut() {
+      return $http.post("/accounts/log_out/", {}).then(function (response) {
+        AccountsModel.clearUser();
+      }, function () {
+        console.error("Log out failed!");
+      });
+    }
+
+    function signUp(firstName, lastName, email, password) {
+      return $http.post("/accounts/sign_up/", {
+        first_name: firstName,
+        last_name: lastName,
+        username: email,
+        email: email,
+        password: password
+      }).then(function () {
+        return logIn(email, password);
+      });
+    }
+
+    return service;
+  }
+
+  angular.module("app")
+    .factory("accountsService", ["$http", "AccountsModel", accountsService]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -349,93 +464,61 @@
 
   "use strict";
 
-  function MembersModel() {
-    var members = [];
+  function LogInController($scope, $state, accountsService) {
+    $scope.error = {};
+    $scope.form = "";
+    $scope.password = "";
+    $scope.username = "";
 
-    var service = {
-      getMembers: getMembers,
-      update: update
+    $scope.hasError = function hasError() {
+      return !_.isEmpty($scope.error);
     };
 
-    function getMembers() {
-      return members;
-    }
-
-    function update(data) {
-
-    }
-
-    return service;
-  }
-
-  angular.module("app")
-    .factory("MembersModel", [MembersModel]);
-
-})(window, window.angular);
-(function (window, angular, undefined) {
-
-  "use strict";
-
-  function loadMembersService($http, BASE_URL, MembersModel) {
-    var service = {
-      getMembers: getMembers
-    };
-
-    function getMembers() {
-      return $http.get(BASE_URL + "library/member/").then(function (response) {
-        MembersModel.update(response.data);
-      }, function () {
-        console.error("Members failed to load!");
+    $scope.onSubmit = function onSubmit() {
+      accountsService.logIn($scope.username, $scope.password).then(function () {
+        $state.go("home");
+      }, function (response) {
+        $scope.error = response.data;
+        $scope.password = "";
       });
-    }
-
-    return service;
+    };
   }
 
   angular.module("app")
-    .factory("loadMembersService", ["$http", "BASE_URL", "MembersModel", loadMembersService]);
+    .controller("LogInController", ["$scope", "$state", "accountsService", LogInController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
 
   "use strict";
 
-  function membersService(MembersModel) {
-    var selectedMember = {};
+  function SignUpController($scope, $state, accountsService) {
+    $scope.email = "";
+    $scope.error = {};
+    $scope.firstName = "";
+    $scope.form = "";
+    $scope.lastName = "";
+    $scope.password1 = "";
+    $scope.password2 = "";
 
-    var service = {
-      getMembers: getMembers,
-      getSelectedMember: getSelectedMember,
-      hasMembers: hasMembers,
-      isSelectedMember: isSelectedMember,
-      setSelectedMember: setSelectedMember
+    $scope.hasError = function hasError() {
+      return !_.isEmpty($scope.error);
     };
 
-    function getMembers() {
-      return MembersModel.getMembers();
-    }
-
-    function getSelectedMember() {
-      return selectedMember;
-    }
-
-    function hasMembers() {
-      return !_.isEmpty(MembersModel.getMembers());
-    }
-
-    function isSelectedMember(member) {
-      return (selectedMember === member);
-    }
-
-    function setSelectedMember(member) {
-      selectedMember = member;
-    }
-
-    return service;
+    $scope.onSubmit = function onSubmit() {
+      accountsService.signUp($scope.firstName, $scope.lastName, $scope.email, $scope.password1).then(function () {
+        $state.go("home");
+      }, function (response) {
+        $scope.error = response.data;
+        $scope.email = "";
+        $scope.password1 = "";
+        $scope.password2 = "";
+      });
+    };
   }
 
   angular.module("app")
-    .factory("membersService", ["MembersModel", membersService]);
+    .controller("SignUpController", ["$scope", "$state", "accountsService", SignUpController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
@@ -456,21 +539,34 @@
 
   "use strict";
 
-  angular.module("app");
+  function HomeController($scope, accountsService) {
+    $scope.hasUser = function hasUser() {
+      return accountsService.hasUser();
+    };
+  }
+
+  angular.module("app")
+    .controller("HomeController", ["$scope", "accountsService", HomeController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
 
   "use strict";
 
-  angular.module("app");
+  function ProfileController($scope) {}
+
+  angular.module("app")
+    .controller("ProfileController", ["$scope", ProfileController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
 
   "use strict";
 
-  angular.module("app");
+  function SettingsController($scope) {}
+
+  angular.module("app")
+    .controller("SettingsController", ["$scope", SettingsController]);
 
 })(window, window.angular);
 (function (window, angular, undefined) {
